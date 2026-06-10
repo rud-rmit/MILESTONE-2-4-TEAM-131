@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tool 2 - Demographics & Injury Analysis</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .tool-content {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+
+        .filter-btn {
+            background: transparent;
+            border: 1px solid currentColor;
+            color: inherit;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1em;
+            font-family: inherit;
+        }
+
+        .filter-btn:hover {
+            opacity: 0.7;
+        }
+
+        .filter-panel {
+            display: none;
+            padding: 20px;
+            border: 1px solid currentColor;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background: rgba(128, 128, 128, 0.05);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group strong {
+            display: block;
+            margin-bottom: 12px;
+            border-bottom: 1px solid currentColor;
+            padding-bottom: 5px;
+            opacity: 0.9;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+        }
+
+        .checkbox-label input {
+            margin-right: 10px;
+        }
+
+        .tables-container {
+            display: flex;
+            gap: 30px;
+            margin: 40px auto;
+            flex-wrap: wrap;
+        }
+
+        .table-wrapper {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .table-wrapper h3 {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid currentColor;
+        }
+
+        .summary-table th,
+        .summary-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid currentColor;
+            text-align: left;
+        }
+
+        .summary-table th {
+            background-color: rgba(128, 128, 128, 0.2);
+            font-weight: bold;
+        }
+
+        .summary-table th.align-right,
+        .summary-table td.align-right {
+            text-align: right;
+        }
+
+        .total-row {
+            background-color: rgba(128, 128, 128, 0.2);
+            font-weight: bold;
+            font-size: 1.05em;
+        }
+
+        .group-row {
+            background-color: rgba(128, 128, 128, 0.1);
+            font-weight: bold;
+        }
+
+        .sub-row td:first-child {
+            padding-left: 35px;
+            opacity: 0.8;
+            position: relative;
+        }
+
+        .sub-row td:first-child::before {
+            content: "↳";
+            position: absolute;
+            left: 15px;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">Victorian Road Safety</div>
+        <nav>
+            <ul>
+                <li><a href="1home.html">Home</a></li>
+                <li><a href="2about.html">About</a></li>
+                <li><a href="3contact.html">Contact</a></li>
+                <li><a href="4tools.html">Tools</a></li>
+
+                <li class="dropdown">
+                    <button class="icon-btn" id="searchBtn" title="Search Tools">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="4tools1.html">Accident info by conditions</a>
+                        <a href="4tools2.html">Focused view of people and injuries</a>
+                        <a href="4tools3.html">Crash Severity Predictor</a>
+                        <a href="4tools4.html">Injury Severity Analyzer</a>
+                    </div>
+                </li>
+
+                <li>
+                    <button id="darkModeBtn" class="icon-btn" title="Toggle Theme">
+                        <svg class="moon-icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <svg class="sun-icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                    </button>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h2>
+        </section>
+
+        <div class="tool-content">
+            <div class="chart-header">
+                <button id="filter-toggle" class="filter-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                        <line x1="9" y1="21" x2="9" y2="9"></line>
+                    </svg>
+                    Filters
+                </button>
+            </div>
+
+            <div id="filter-panel" class="filter-panel">
+                <div class="filter-group">
+                    <div style="flex: 1; min-width: 150px;">
+                        <strong>Age Range</strong>
+                        <div id="age-filters"></div>
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <strong>Taken to Hospital</strong>
+                        <div id="hosp-filters"></div>
+                    </div>
+                    <div style="flex: 1; min-width: 180px;">
+                        <strong>Injury Outcome</strong>
+                        <div id="outcome-filters"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="height: 400px; width: 100%; position: relative;">
+                <canvas id="demographicsChart"></canvas>
+            </div>
+
+            <div class="tables-container">
+                <div class="table-wrapper">
+                    <h3>Summary Table 1: Age Group vs Hospital Transportation</h3>
+                    <table class="summary-table">
+                        <thead>
+                            <tr>
+                                <th>Age / Hospital Status</th>
+                                <th class="align-right">Total Records</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hospital-table-body"></tbody>
+                    </table>
+                </div>
+
+                <div class="table-wrapper">
+                    <h3>Summary Table 2: Age Group vs Injury Outcomes</h3>
+                    <table class="summary-table">
+                        <thead>
+                            <tr>
+                                <th>Age / Severity Outcome</th>
+                                <th class="align-right">Total Records</th>
+                            </tr>
+                        </thead>
+                        <tbody id="injury-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+
+        const dbData = [
+            { "a": "0-15", "h": "Yes", "o": "Fatality", "c": 41 }, { "a": "0-15", "h": "Yes", "o": "Serious Injury", "c": 212 }, { "a": "0-15", "h": "Yes", "o": "Other Injury", "c": 377 }, { "a": "0-15", "h": "No", "o": "Other Injury", "c": 126 }, { "a": "0-15", "h": "No", "o": "No Injury", "c": 740 },
+            { "a": "16-21", "h": "Yes", "o": "Fatality", "c": 921 }, { "a": "16-21", "h": "Yes", "o": "Serious Injury", "c": 3184 }, { "a": "16-21", "h": "Yes", "o": "Other Injury", "c": 4841 }, { "a": "16-21", "h": "No", "o": "Other Injury", "c": 2215 }, { "a": "16-21", "h": "No", "o": "No Injury", "c": 10087 },
+            { "a": "22-29", "h": "Yes", "o": "Fatality", "c": 1648 }, { "a": "22-29", "h": "Yes", "o": "Serious Injury", "c": 4592 }, { "a": "22-29", "h": "Yes", "o": "Other Injury", "c": 7126 }, { "a": "22-29", "h": "No", "o": "Other Injury", "c": 3305 }, { "a": "22-29", "h": "No", "o": "No Injury", "c": 15077 },
+            { "a": "30-39", "h": "Yes", "o": "Fatality", "c": 1572 }, { "a": "30-39", "h": "Yes", "o": "Serious Injury", "c": 4183 }, { "a": "30-39", "h": "Yes", "o": "Other Injury", "c": 7721 }, { "a": "30-39", "h": "No", "o": "Other Injury", "c": 2484 }, { "a": "30-39", "h": "No", "o": "No Injury", "c": 16049 },
+            { "a": "40-49", "h": "Yes", "o": "Fatality", "c": 1683 }, { "a": "40-49", "h": "Yes", "o": "Serious Injury", "c": 3811 }, { "a": "40-49", "h": "Yes", "o": "Other Injury", "c": 6374 }, { "a": "40-49", "h": "No", "o": "Other Injury", "c": 2338 }, { "a": "40-49", "h": "No", "o": "No Injury", "c": 13983 },
+            { "a": "50-64", "h": "Yes", "o": "Fatality", "c": 2936 }, { "a": "50-64", "h": "Yes", "o": "Serious Injury", "c": 5472 }, { "a": "50-64", "h": "Yes", "o": "Other Injury", "c": 8371 }, { "a": "50-64", "h": "No", "o": "Other Injury", "c": 3433 }, { "a": "50-64", "h": "No", "o": "No Injury", "c": 19642 },
+            { "a": "65+", "h": "Yes", "o": "Fatality", "c": 3414 }, { "a": "65+", "h": "Yes", "o": "Serious Injury", "c": 3956 }, { "a": "65+", "h": "Yes", "o": "Other Injury", "c": 4012 }, { "a": "65+", "h": "No", "o": "Other Injury", "c": 3620 }, { "a": "65+", "h": "No", "o": "No Injury", "c": 12034 }
+        ];
+
+        const ageArr = ['0-15', '16-21', '22-29', '30-39', '40-49', '50-64', '65+'];
+        const hospArr = ['Yes', 'No'];
+        const outcomeArr = ['Fatality', 'Serious Injury', 'Other Injury', 'No Injury'];
+        let myGraph = null;
+
+        const toggleBtn = document.getElementById('filter-toggle');
+        const filterPanel = document.getElementById('filter-panel');
+
+        toggleBtn.addEventListener('click', () => {
+            filterPanel.style.display = (filterPanel.style.display === 'block') ? 'none' : 'block';
+        });
+
+        ageArr.forEach(x => document.getElementById('age-filters').innerHTML += `<label class="checkbox-label"><input type="checkbox" class="abox" value="${x}" checked> ${x}</label>`);
+        hospArr.forEach(y => document.getElementById('hosp-filters').innerHTML += `<label class="checkbox-label"><input type="checkbox" class="hbox" value="${y}" checked> Taken to Hospital (${y})</label>`);
+        outcomeArr.forEach(z => document.getElementById('outcome-filters').innerHTML += `<label class="checkbox-label"><input type="checkbox" class="obox" value="${z}" checked> ${z}</label>`);
+
+        function redraw() {
+            const chosenA = Array.from(document.querySelectorAll('.abox:checked')).map(k => k.value);
+            const chosenH = Array.from(document.querySelectorAll('.hbox:checked')).map(k => k.value);
+            const chosenO = Array.from(document.querySelectorAll('.obox:checked')).map(k => k.value);
+
+            const flt = dbData.filter(d => chosenA.includes(d.a) && chosenH.includes(d.h) && chosenO.includes(d.o));
+
+            const hTableBody = document.getElementById('hospital-table-body');
+            const iTableBody = document.getElementById('injury-table-body');
+            const overallTotal = flt.reduce((s, d) => s + d.c, 0);
+
+
+            hTableBody.innerHTML = `<tr class="total-row"><td>OVERALL TOTAL</td><td class="align-right">${overallTotal.toLocaleString()}</td></tr>`;
+            chosenA.forEach(ageItem => {
+                const subGrp = flt.filter(d => d.a === ageItem);
+                const subTotal = subGrp.reduce((s, d) => s + d.c, 0);
+                hTableBody.innerHTML += `<tr class="group-row"><td>Age ${ageItem}</td><td class="align-right">${subTotal.toLocaleString()}</td></tr>`;
+
+                chosenH.forEach(hospItem => {
+                    const countVal = subGrp.filter(d => d.h === hospItem).reduce((s, d) => s + d.c, 0);
+                    hTableBody.innerHTML += `<tr class="sub-row"><td>Hospitalization: ${hospItem}</td><td class="align-right">${countVal.toLocaleString()}</td></tr>`;
+                });
+            });
+
+
+            iTableBody.innerHTML = `<tr class="total-row"><td>OVERALL TOTAL</td><td class="align-right">${overallTotal.toLocaleString()}</td></tr>`;
+            chosenA.forEach(ageItem => {
+                const subGrp = flt.filter(d => d.a === ageItem);
+                const subTotal = subGrp.reduce((s, d) => s + d.c, 0);
+                iTableBody.innerHTML += `<tr class="group-row"><td>Age ${ageItem}</td><td class="align-right">${subTotal.toLocaleString()}</td></tr>`;
+
+                chosenO.forEach(outcomeItem => {
+                    const countVal = subGrp.filter(d => d.o === outcomeItem).reduce((s, d) => s + d.c, 0);
+                    iTableBody.innerHTML += `<tr class="sub-row"><td>Outcome: ${outcomeItem}</td><td class="align-right">${countVal.toLocaleString()}</td></tr>`;
+                });
+            });
+
+
+            const txtCol = getComputedStyle(document.body).color;
+            if (myGraph) myGraph.destroy();
+
+
+            const hospitalYesData = chosenA.map(ageItem => flt.filter(d => d.a === ageItem && d.h === 'Yes').reduce((s, d) => s + d.c, 0));
+            const injuriesSustainedData = chosenA.map(ageItem => flt.filter(d => d.a === ageItem && d.o !== 'No Injury').reduce((s, d) => s + d.c, 0));
+
+            myGraph = new Chart(document.getElementById('demographicsChart'), {
+                type: 'bar',
+                data: {
+                    labels: chosenA,
+                    datasets: [
+                        {
+                            label: 'Taken To Hospital',
+                            data: hospitalYesData,
+                            backgroundColor: '#1f77b4',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Injuries Sustained (Fatal/Serious/Other)',
+                            data: injuriesSustainedData,
+                            backgroundColor: '#ff7f0e',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    color: txtCol,
+                    scales: {
+                        x: { ticks: { color: txtCol }, grid: { color: 'rgba(128,128,128,0.2)' } },
+                        y: { ticks: { color: txtCol }, grid: { color: 'rgba(128,128,128,0.2)' } }
+                    },
+                    plugins: {
+                        legend: { position: 'top', align: 'end', labels: { color: txtCol } }
+                    }
+                }
+            });
+        }
+
+
+        document.querySelectorAll('input[type="checkbox"]').forEach(box => box.addEventListener('change', redraw));
+
+        document.getElementById('darkModeBtn').addEventListener('click', () => {
+            setTimeout(redraw, 50);
+        });
+
+        redraw();
+    </script>
+</body>
+
+</html>
