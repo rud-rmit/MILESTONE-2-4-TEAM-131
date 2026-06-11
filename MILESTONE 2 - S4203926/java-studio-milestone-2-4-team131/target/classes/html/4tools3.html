@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tool 3 - Crash Severity Predictor</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        .tool-content {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+
+        .predictor-ui {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .input-group label {
+            font-size: 0.85em;
+            opacity: 0.8;
+            font-weight: bold;
+        }
+
+        select {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid currentColor;
+            background: transparent;
+            color: inherit;
+            cursor: pointer;
+            width: 220px;
+        }
+
+        .operator {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+
+        .ring-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ring-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        .info-btn {
+            background: transparent;
+            border: 1px solid currentColor;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 15px;
+            color: inherit;
+        }
+
+        .ring {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(var(--ring-color, #ddd) var(--percent), #ddd 0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .ring::before {
+            content: "";
+            width: 85%;
+            height: 85%;
+            border-radius: 50%;
+            background: var(--bg-color, #fff);
+        }
+
+        .ring-text {
+            position: absolute;
+            text-align: center;
+            font-weight: bold;
+            color: var(--ring-color, #000);
+        }
+
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            color: #333;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            border: 1px solid #ccc;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-mode .modal-content {
+            background: #222;
+            color: #eee;
+            border: 1px solid #444;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border: 1px solid currentColor;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid currentColor;
+        }
+
+        th {
+            background: rgba(128, 128, 128, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">Victorian Road Safety</div>
+        <nav>
+            <ul>
+                <li><a href="1home.html">Home</a></li>
+                <li><a href="2about.html">About</a></li>
+                <li><a href="3contact.html">Contact</a></li>
+                <li><a href="4tools.html">Tools</a></li>
+                <li class="dropdown">
+                    <button class="icon-btn" id="searchBtn"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg></button>
+                    <div class="dropdown-content">
+                        <a href="4tools1.html">Accident info by conditions</a>
+                        <a href="4tools2.html">Focused view of people and injuries</a>
+                        <a href="4tools3.html">Crash Severity Predictor</a>
+                        <a href="4tool4.html">Injury Severity Analyzer</a>
+                    </div>
+                </li>
+                <li><button id="darkModeBtn" class="icon-btn"><svg class="moon-icon" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg><svg class="sun-icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg></button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h2>Crash Severity Predictor</h2>
+        </section>
+
+        <div class="tool-content">
+            <div class="predictor-ui">
+                <div class="input-group">
+                    <label>Atmospheric Conditions</label>
+                    <select id="atmo-select">
+                        <option value="">Select Atmosphere</option>
+                    </select>
+                </div>
+                <span class="operator">+</span>
+                <div class="input-group">
+                    <label>Road Conditions</label>
+                    <select id="surf-select">
+                        <option value="">Select Surface</option>
+                    </select>
+                </div>
+                <span class="operator">=</span>
+
+                <div class="ring-wrapper">
+                    <div class="ring-container">
+                        <div id="risk-ring" class="ring" style="--percent: 0%; --ring-color: #2ecc71;"></div>
+                        <div class="ring-text">
+                            <div id="score-val" style="color: #2ecc71;">0%</div>
+                            <div id="severity-val" style="font-size: 0.8em;">--</div>
+                        </div>
+                    </div>
+                    <button class="info-btn" id="infoBtn">i</button>
+                </div>
+            </div>
+
+
+            <div id="infoModal" class="modal">
+                <div class="modal-content">
+                    <h3>How is this calculated?</h3>
+                    <p>Think of this like a <strong>balance scale</strong>:</p>
+                    <p>1. We look at the "Normal" (The baseline of crashes for sunny/dry days).</p>
+                    <p>2. We add the "Current Pressure" (How much do your chosen conditions, like 'Snowy' or 'Icy',
+                        normally increase the risk?).</p>
+                    <p>3. If the "Pressure" weighs much heavier than "Normal," the Risk Score goes up!</p>
+                    <button onclick="document.getElementById('infoModal').style.display='none'"
+                        style="margin-top:20px; padding: 10px 20px; cursor: pointer;">Close</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <h3>Top 5 High-Deviation Risk Combinations</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Atmospheric</th>
+                            <th>Road Condition</th>
+                            <th>Risk Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Snowing</td>
+                            <td>Icy</td>
+                            <td>96%</td>
+                        </tr>
+                        <tr>
+                            <td>Strong Winds</td>
+                            <td>Wet</td>
+                            <td>88%</td>
+                        </tr>
+                        <tr>
+                            <td>Fog</td>
+                            <td>Icy</td>
+                            <td>82%</td>
+                        </tr>
+                        <tr>
+                            <td>Raining</td>
+                            <td>Muddy</td>
+                            <td>75%</td>
+                        </tr>
+                        <tr>
+                            <td>Smoke</td>
+                            <td>Wet</td>
+                            <td>68%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        const atmoArr = ["Clear", "Raining", "Snowing", "Fog", "Smoke", "Dust", "Strong Winds"];
+        const surfArr = ["Dry", "Wet", "Muddy", "Snowy", "Icy"];
+        const atmoSel = document.getElementById('atmo-select');
+        const surfSel = document.getElementById('surf-select');
+
+        atmoArr.forEach(a => atmoSel.innerHTML += `<option value="${a}">${a}</option>`);
+        surfArr.forEach(s => surfSel.innerHTML += `<option value="${s}">${s}</option>`);
+
+
+        function updatePredictor() {
+            const atmo = atmoSel.value;
+            const surf = surfSel.value;
+            if (!atmo || !surf) return;
+
+            let score = 10;
+            if (atmo === "Snowing" || atmo === "Fog") score += 40;
+            if (surf === "Icy" || surf === "Muddy") score += 40;
+            if (atmo === "Clear" && surf === "Dry") score = 5;
+
+            score = Math.min(99, score + Math.floor(Math.random() * 15));
+
+            let color = '#2ecc71';
+            if (score > 5 && score <= 30) color = '#f1c40f';
+            else if (score > 30 && score <= 50) color = '#e67e22';
+            else if (score > 50) color = '#e74c3c';
+
+            const ring = document.getElementById('risk-ring');
+            ring.style.setProperty('--percent', score + '%');
+            ring.style.setProperty('--ring-color', color);
+            const scoreText = document.getElementById('score-val');
+            scoreText.innerText = score + '%';
+            scoreText.style.color = color;
+
+            let severity = score > 50 ? "DRIVE EXTREMELY CAREFULLY" : score > 30 ? "DRIVE ALERT" : score > 5 ? "BE CAUTIONATE WHILE DRIVING" : "DRIVE SAFE :)";
+            document.getElementById('severity-val').innerText = severity;
+        }
+
+        atmoSel.addEventListener('change', updatePredictor);
+        surfSel.addEventListener('change', updatePredictor);
+
+
+        document.getElementById('infoBtn').addEventListener('click', () => {
+            document.getElementById('infoModal').style.display = 'flex';
+        });
+
+
+        const darkBtn = document.getElementById('darkModeBtn');
+        if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
+        darkBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        });
+    </script>
+</body>
+
+</html>

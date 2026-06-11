@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tools - Victorian Road Safety</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">Victorian Road Safety</div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="tools.html">Tools</a></li>
+
+                <li class="dropdown">
+                    <button class="icon-btn" id="searchBtn" title="Search Tools">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="tool1.html">Accident info by conditions</a>
+                        <a href="tool2.html">Focused view of people and injuries</a>
+                        <a href="tool3.html">Crash Severity Predictor</a>
+                        <a href="tool4.html">Injury Severity Analyzer</a>
+                    </div>
+                </li>
+
+                <li>
+                    <button id="darkModeBtn" class="icon-btn" title="Toggle Theme">
+                        <svg class="moon-icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <svg class="sun-icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                    </button>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h2>Analytical Tools & Predictors</h2>
+        </section>
+
+        <section class="facts-grid">
+            <a href="tool1.html" class="fact-card tool-link" style="text-decoration: none; color: inherit;">
+                <h3>Accident information based on road and atmospheric condition</h3>
+            </a>
+
+            <a href="tool2.html" class="fact-card tool-link" style="text-decoration: none; color: inherit;">
+                <h3>Focused view of people and injuries sustained</h3>
+            </a>
+
+            <a href="tool3.html" class="fact-card tool-link" style="text-decoration: none; color: inherit;">
+                <h3>Crash Severity Predictor</h3>
+            </a>
+
+            <a href="tool4.html" class="fact-card tool-link" style="text-decoration: none; color: inherit;">
+                <h3>Injury Severity Analyzer</h3>
+            </a>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
